@@ -4,18 +4,31 @@ class Todo extends Component {
   constructor(props, context) {
     super(props, context);
 
+    console.log('props', this.props)
+
     this.state = {
       todos: [],
       newTodo: {
         label: '',
         content: ''
       },
-      lebelForNewTodo: ''
+      labelForNewTodo: 'blue',
+      filterLabel: 'all'
     }
 
     this.setNewTodoContent = this.setNewTodoContent.bind(this)
     this.addTodo = this.addTodo.bind(this)
     this.setLabelForNewTodo = this.setLabelForNewTodo.bind(this)
+    this.filterLabel = this.filterLabel.bind(this)
+  }
+
+  filterLabel(value) {
+    console.log(value)
+    let url = '/' + value
+    this.props.history.push(url)
+    this.setState({
+      filterLabel: value
+    })
   }
 
   setNewTodoContent(value) {
@@ -36,9 +49,7 @@ class Todo extends Component {
     let todos = this.state.todos
     let todo = this.state.newTodo
     todo.label = this.state.labelForNewTodo
-    console.log('label', todo.label)
-    console.log('state', this.state)
-    console.log('todo', todo)
+
     todos.push(todo)
     this.setState({
       todos: todos,
@@ -50,14 +61,18 @@ class Todo extends Component {
   }
   render() {
     let firstTodo
-    if (this.state.todos.length > 0) {
+    console.log('state', this.state)
+    let todos = filterTodos(this.state.filterLabel, this.state.todos)
+    console.log('todos', this.state.todos)
+    console.log('filterTodos', todos)
+    if (todos.length > 0) {
 
-      firstTodo = <TodoCard todo={this.state.todos[0]}></TodoCard>
+      firstTodo = <TodoCard todo={todos[0]}></TodoCard>
     }
-    let todos = this.state.todos
+
     let todoRows = []
     if (todos.length > 1) {
-      let todosInChunk = splitArray(todos)
+      let todosInChunk = splitArray(todos.slice(1))
 
       todosInChunk.forEach((todoArray) => {
         let todoRow = createTodoRow(todoArray)
@@ -67,7 +82,23 @@ class Todo extends Component {
 
     return (
       <div className="container">
+
         <div className="row">
+          <div className="col-3">
+            <button type="button" className="btn btn-primary" style={{width: '100%'}} onClick={() => this.filterLabel('all')} >All</button>
+          </div>
+          <div className="col-3">
+            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: 'red'}} onClick={() => this.filterLabel('red')} >Red</button>
+          </div>
+          <div className="col-3">
+            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: 'green'}} onClick={() => this.filterLabel('green')} >Green</button>
+          </div>
+          <div className="col-3">
+            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: 'blue'}} onClick={() => this.filterLabel('blue')} >Blue</button>
+          </div>
+        </div>
+
+        <div className="row mt-3">
 
           <div className='col-sm-8 col-12'>
             <div className="card">
@@ -124,7 +155,7 @@ function createTodoRow(todoArray) {
   })
 
   return (
-    <div className="row">
+    <div className="row mt-3">
       {todoColumns}
     </div>
   )
@@ -144,4 +175,11 @@ function TodoCard(props) {
       </div>
     </div>
   )
+}
+
+function filterTodos(label, todos) {
+  if (label == 'all') {
+    return todos
+  }
+  return todos.filter(todo => todo.label == label)
 }
