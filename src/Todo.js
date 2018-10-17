@@ -56,7 +56,7 @@ class Todo extends Component {
   setLabelForNewTodo(value) {
     this.setState({
       labelForNewTodo: value
-    }, this.saveToLocalStorage(value))
+    }, this.saveToLocalStorage())
   }
 
   addTodo() {
@@ -117,13 +117,13 @@ class Todo extends Component {
             <button type="button" className="btn btn-primary" style={{width: '100%'}} onClick={() => this.filterLabel('all')} >All</button>
           </div>
           <div className="col-3">
-            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: 'red'}} onClick={() => this.filterLabel('red')} >Red</button>
+            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: getBackgroundColor('red')}} onClick={() => this.filterLabel('red')} >Red</button>
           </div>
           <div className="col-3">
-            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: 'green'}} onClick={() => this.filterLabel('green')} >Green</button>
+            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: getBackgroundColor('green')}} onClick={() => this.filterLabel('green')} >Green</button>
           </div>
           <div className="col-3">
-            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: 'blue'}} onClick={() => this.filterLabel('blue')} >Blue</button>
+            <button type="button" className="btn btn-primary" style={{width: '100%', backgroundColor: getBackgroundColor('blue')}} onClick={() => this.filterLabel('blue')} >Blue</button>
           </div>
         </div>
 
@@ -135,9 +135,9 @@ class Todo extends Component {
                 <input type="text" value={this.state.newTodo.content} onChange={(e) => this.setNewTodoContent(e.target.value)}/>
               </div>
               <div className="btn-group" role="group" aria-label="Basic example">
-                <button type="button" className="btn btn-secondary" style={{backgroundColor:  'blue'}} onClick={() => this.setLabelForNewTodo('blue')}>Blue</button>
-                <button type="button" className="btn btn-secondary" style={{backgroundColor:  'green'}} onClick={() => this.setLabelForNewTodo('green')}>Green</button>
-                <button type="button" className="btn btn-secondary" style={{backgroundColor:  'red'}} onClick={() => this.setLabelForNewTodo('red')}>Red</button>
+                <button type="button" className="btn btn-secondary" style={{backgroundColor:  getBackgroundColor('blue')}} onClick={() => this.setLabelForNewTodo('blue')}>Blue</button>
+                <button type="button" className="btn btn-secondary" style={{backgroundColor:  getBackgroundColor('green')}} onClick={() => this.setLabelForNewTodo('green')}>Green</button>
+                <button type="button" className="btn btn-secondary" style={{backgroundColor:  getBackgroundColor('red')}} onClick={() => this.setLabelForNewTodo('red')}>Red</button>
               </div>
               <button type="button" className="btn btn-primary" onClick={this.addTodo} >Add todo</button>
             </div>
@@ -195,7 +195,7 @@ function TodoCard(props) {
   return (
     <div className="col-sm-4 col-12 mb-3" onClick={() => goToTodo(todo.id)}>
       <div className="card">
-      <div className="card-header" style={{backgroundColor: todo.label}}>
+      <div className="card-header" style={{backgroundColor: getBackgroundColor(todo.label)}}>
 
       </div>
         <div className="card-body">
@@ -215,4 +215,14 @@ function filterTodos(label, todos) {
 
 function goToTodo(id) {
   window.location.href = `localhost:3000/todo/{id}`
+}
+
+function getBackgroundColor(color) {
+  if (color == 'red') {
+    return '#D32F2F'
+  } else if (color == 'blue') {
+    return '#2E86C1'
+  } else if (color == 'green') {
+    return '#28B463'
+  }
 }
