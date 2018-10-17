@@ -6,20 +6,34 @@ class Todo extends Component {
 
     console.log('props', this.props)
 
-    this.state = {
-      todos: [],
-      newTodo: {
-        label: '',
-        content: ''
-      },
-      labelForNewTodo: 'blue',
-      filterLabel: 'all'
+    let stateFromLocalStorage = localStorage.getItem('state')
+    console.log('localStoragestate', stateFromLocalStorage)
+    if (stateFromLocalStorage) {
+      this.state = JSON.parse(stateFromLocalStorage)
+      if (this.props.match.params.label) {
+        this.state.filterLabel = this.props.match.params.label
+      } else {
+        this.state.filterLabel = 'all'
+      }
+    } else {
+
+      this.state = {
+        todos: [],
+        newTodo: {
+          label: '',
+          content: ''
+        },
+        labelForNewTodo: 'blue',
+        filterLabel: 'all'
+      }
     }
+
 
     this.setNewTodoContent = this.setNewTodoContent.bind(this)
     this.addTodo = this.addTodo.bind(this)
     this.setLabelForNewTodo = this.setLabelForNewTodo.bind(this)
     this.filterLabel = this.filterLabel.bind(this)
+    this.saveToLocalStorage = this.saveToLocalStorage.bind(this)
   }
 
   filterLabel(value) {
@@ -28,7 +42,7 @@ class Todo extends Component {
     this.props.history.push(url)
     this.setState({
       filterLabel: value
-    })
+    }, this.saveToLocalStorage())
   }
 
   setNewTodoContent(value) {
@@ -36,19 +50,20 @@ class Todo extends Component {
     newTodo.content = value
     this.setState({
       newTodo: newTodo
-    })
+    }, this.saveToLocalStorage())
   }
 
   setLabelForNewTodo(value) {
     this.setState({
       labelForNewTodo: value
-    })
+    }, this.saveToLocalStorage(value))
   }
 
   addTodo() {
     let todos = this.state.todos
     let todo = this.state.newTodo
     todo.label = this.state.labelForNewTodo
+    todo.id = this.state.todos.length + 1
 
     todos.push(todo)
     this.setState({
@@ -57,7 +72,21 @@ class Todo extends Component {
         content: '',
         label: ''
       }
-    })
+    }, this.saveToLocalStorage())
+  }
+
+  saveToLocalStorage(label) {
+    let state = this.state
+    if (label) {
+      state.filterLabel = label
+    }
+    console.log('state', state)
+    localStorage.setItem('state', JSON.stringify(state))
+  }
+
+  goToTodo(id) {
+    let url = '/todo/' + id
+    this.props.history.push(url)
   }
   render() {
     let firstTodo
@@ -164,7 +193,7 @@ function createTodoRow(todoArray) {
 function TodoCard(props) {
   let todo = props.todo
   return (
-    <div className="col-sm-4 col-12">
+    <div className="col-sm-4 col-12 mb-3" onClick={() => goToTodo(todo.id)}>
       <div className="card">
       <div className="card-header" style={{backgroundColor: todo.label}}>
 
@@ -182,4 +211,8 @@ function filterTodos(label, todos) {
     return todos
   }
   return todos.filter(todo => todo.label == label)
+}
+
+function goToTodo(id) {
+  window.location.href = `localhost:3000/todo/{id}`
 }
